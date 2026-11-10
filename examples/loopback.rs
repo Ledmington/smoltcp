@@ -63,6 +63,22 @@ mod mock {
     }
 }
 
+// Fault handlers required by ASPIS-hardened binaries.
+#[cfg(aspis)]
+#[unsafe(no_mangle)]
+pub extern "C" fn DataCorruption_Handler() {
+    eprintln!("ASPIS: data corruption detected");
+    std::process::exit(-1);
+}
+
+#[cfg(aspis)]
+#[unsafe(no_mangle)]
+pub extern "C" fn SigMismatch_Handler() {
+    eprintln!("ASPIS: signature mismatch detected");
+    std::process::exit(-1);
+}
+
+#[cfg_attr(aspis, aspis_rust_annotations::aspis(to_harden))]
 fn main() {
     let clock = mock::Clock::new();
     let device = Loopback::new(Medium::Ethernet);
